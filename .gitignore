@@ -1,0 +1,8 @@
+# 環境檔
+.env
+
+# 編譯檔
+bin/
+
+# vscode
+.vscode/
