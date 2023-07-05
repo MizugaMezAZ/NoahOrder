@@ -1,11 +1,14 @@
-package api
+package router
 
-type IRouter interface {
+import "github.com/gin-gonic/gin"
+
+type router struct {
 }
 
-type Router struct {
+func NewRouter() *router {
+	return &router{}
 }
 
-func NewRouter() IRouter {
-	return &Router{}
+func (r *router) SetupRoute(e *gin.Engine) {
+	e.Use()
 }

@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"gorder/db"
 	"gorder/logger"
 	"net/http"
 	"os"
@@ -59,5 +60,5 @@ func main() {
 }
 
 func fiveLionFit() {
-
+	db.NewRedis()
 }

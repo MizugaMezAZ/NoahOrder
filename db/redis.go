@@ -11,7 +11,7 @@ import (
 var RDB *redis.Client
 
 // BuildRedisConnection ...
-func BuildRedisConnection() {
+func NewRedis() {
 	RDB = redis.NewClient(&redis.Options{
 		Addr:     "6389",
 		Password: "", // no password set

@@ -10,7 +10,7 @@ import (
 
 var DB *sqlx.DB
 
-func CreateDBPool() {
+func NewDB() {
 	var err error
 	dsn := fmt.Sprintf("%s:%s@tcp(%s:3306)/%s?parseTime=true&loc=UTC",
 		"root",
