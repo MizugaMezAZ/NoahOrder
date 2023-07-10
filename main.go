@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"gorder/db"
 	"gorder/logger"
+	"gorder/logger/zap"
 	"net/http"
 	"os"
 	"os/signal"
@@ -16,6 +17,9 @@ import (
 )
 
 func init() {
+	file := logger.GetRotationWriter("./log/" + "")
+	l := zap.New(file, zap.DebugLevel, true)
+	logger.SetDefaultLogger(l)
 
 }
 
@@ -60,5 +64,6 @@ func main() {
 }
 
 func fiveLionFit() {
+	db.NewDB()
 	db.NewRedis()
 }

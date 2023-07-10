@@ -1,262 +1,128 @@
 package logger
 
 import (
-	"fmt"
-	"io/ioutil"
-	"os"
-	"runtime/debug"
+	"io"
 	"time"
 
-	"github.com/fatih/color"
+	rotatelogs "github.com/lestrrat-go/file-rotatelogs"
 )
 
-var e = NewEntity()
+/*
+	支援运行更改日志级别
+	TODO: 支援 rotation
+	TODO: 支援 logstash
+	TODO: 支援多输出
 
-// DisableMsg disable entity msg log
-func DisableMsg() {
-	e.EnableMsg = false
+*/
+
+// DefaultLogger 整個應用程序需要一個記錄器的全局實例，因此可以在一處更改日誌配置並將其應用於整個應用程序。
+var DefaultLogger Logger = &Log{}
+
+// Logger 無需修改業務代碼即可切換到其他日誌庫 不直接依賴任何日誌庫
+type Logger interface {
+	Error(args ...interface{})
+	Errorf(format string, args ...interface{})
+
+	Fatalf(format string, args ...interface{})
+	Fatal(args ...interface{})
+
+	Infof(format string, args ...interface{})
+	Info(args ...interface{})
+
+	Warnf(format string, args ...interface{})
+	Warn(args ...interface{})
+
+	Debugf(format string, args ...interface{})
+	Debug(args ...interface{})
+
+	Panicf(format string, args ...interface{})
+	Panic(args ...interface{})
+
+	With(val ...interface{}) Logger
 }
 
-// EnableMsg enable entity msg log
-func EnableMsg() {
-	e.EnableMsg = true
+// SetDefaultLogger ..
+func SetDefaultLogger(l Logger) {
+	DefaultLogger = l
 }
 
-// DisableInfo disable entity info log
-func DisableInfo() {
-	e.EnableInfo = false
-}
+// GetRotationWriter ...
+func GetRotationWriter(filename string) io.Writer {
+	hook, err := rotatelogs.New(
+		filename+"-%Y-%m-%d.log",
+		rotatelogs.WithLinkName(filename+"_link.log"),
+		rotatelogs.WithMaxAge(time.Hour*30*24),
+		rotatelogs.WithRotationTime(time.Hour*24),
+	)
 
-// EnableInfo enable entity info log
-func EnableInfo() {
-	e.EnableInfo = true
-}
-
-// var recvPrefix = color.HiGreenString("recv ")
-
-// //MsgRecv output log with recvPrefix if config msg enable
-// func MsgRecv(v ...interface{}) {
-// 	if e.EnableMsg {
-// 		e.checkNewDayWithLock()
-// 		e.lg.SetPrefix(recvPrefix)
-// 		e.lg.Output(2, fmt.Sprintln(v...))
-// 	}
-// }
-
-// // MsgRecvf output log with recvPrefix in format if config msg enable
-// func MsgRecvf(format string, v ...interface{}) {
-// 	if e.EnableMsg {
-// 		e.checkNewDayWithLock()
-// 		e.lg.SetPrefix(recvPrefix)
-// 		e.lg.Output(2, fmt.Sprintf(format, v...))
-// 	}
-// }
-
-// var sendPrefix = color.HiYellowString("send ")
-
-// // MsgSend output log with sendPrefix if config msg enable
-// func MsgSend(v ...interface{}) {
-// 	if e.EnableMsg {
-// 		e.checkNewDayWithLock()
-// 		e.lg.SetPrefix(sendPrefix)
-// 		e.lg.Output(2, fmt.Sprintln(v...))
-// 	}
-// }
-
-// // MsgSendf output log with sendPrefix in format if config msg enable
-// func MsgSendf(format string, v ...interface{}) {
-// 	if e.EnableMsg {
-// 		e.checkNewDayWithLock()
-// 		e.lg.SetPrefix(sendPrefix)
-// 		e.lg.Output(2, fmt.Sprintf(format, v...))
-// 	}
-// }
-
-var errorPrefix = color.RedString("ERRO ")
-
-// Err output log with errorPrefix
-func Error(v ...interface{}) {
-	e.checkNewDayWithLock()
-	e.lg.SetPrefix(errorPrefix)
-	e.lg.Output(2, fmt.Sprintln(v...))
-}
-
-// Errf output log with errorPrefix in format
-func Errorf(format string, v ...interface{}) {
-	e.checkNewDayWithLock()
-	e.lg.SetPrefix(errorPrefix)
-	e.lg.Output(2, fmt.Sprintf(format, v...))
-}
-
-var infoPrefix = "INFO "
-
-// Info output log with infoPrefix if config info enable
-func Info(v ...interface{}) {
-	if e.EnableInfo {
-		e.checkNewDayWithLock()
-		e.lg.SetPrefix(infoPrefix)
-		e.lg.Output(2, fmt.Sprintln(v...))
-	}
-}
-
-// Infof output log with infoPrefix in format if config info enable
-func Infof(format string, v ...interface{}) {
-	if e.EnableInfo {
-		e.checkNewDayWithLock()
-		e.lg.SetPrefix(infoPrefix)
-		e.lg.Output(2, fmt.Sprintf(format, v...))
-	}
-}
-
-var debugPrefix = color.BlueString("DEBG ")
-
-// Debugf output log with debugPrefix in format if config info enable
-func Debug(v ...interface{}) {
-	if e.EnableInfo {
-		e.checkNewDayWithLock()
-		e.lg.SetPrefix(debugPrefix)
-		e.lg.Output(2, fmt.Sprintln(v...))
-	}
-}
-
-// Debugf output log with debugPrefix in format if config info enable
-func Debugf(format string, v ...interface{}) {
-	if e.EnableInfo {
-		e.checkNewDayWithLock()
-		e.lg.SetPrefix(debugPrefix)
-		e.lg.Output(2, fmt.Sprintf(format, v...))
-	}
-}
-
-var warnPrefix = color.YellowString("WARN ")
-
-// Warn output log with warnPrefix if config info enable
-func Warn(v ...interface{}) {
-	if e.EnableInfo {
-		e.checkNewDayWithLock()
-		e.lg.SetPrefix(warnPrefix)
-		e.lg.Output(2, fmt.Sprintln(v...))
-	}
-}
-
-// Warnf output log with warnPrefix in format if config info enable
-func Warnf(format string, v ...interface{}) {
-	if e.EnableInfo {
-		e.checkNewDayWithLock()
-		e.lg.SetPrefix(warnPrefix)
-		e.lg.Output(2, fmt.Sprintf(format, v...))
-	}
-}
-
-// var golderrorPrefix = color.RedString("golderror ")
-
-// // GoldErr output log with golderrorPrefix
-// func GoldError(v ...interface{}) {
-// 	e.checkNewDayWithLock()
-// 	e.lg.SetPrefix(golderrorPrefix)
-// 	msg := fmt.Sprintln(v...)
-// 	e.lg.Output(2, msg)
-// }
-
-// // GoldErrf output log with golderrorPrefix in format
-// func GoldErrorf(format string, v ...interface{}) {
-// 	e.checkNewDayWithLock()
-// 	e.lg.SetPrefix(golderrorPrefix)
-// 	msg := fmt.Sprintf(format, v...)
-// 	e.lg.Output(2, msg)
-// }
-
-var fatalPrefix = color.RedString("FATL ")
-
-// Fatalf output log with golderrorPrefix in format, and trig fatal os.Exit(1)
-func Fatalf(format string, v ...interface{}) {
-	fmt.Println(v...)
-
-	e.checkNewDayWithLock()
-	e.lg.SetPrefix(fatalPrefix)
-	e.lg.Output(2, fmt.Sprintf(format, v...))
-
-	e.logfile.Write(debug.Stack())
-	os.Exit(1)
-}
-
-// Fatal output log with golderrorPrefix, and trig fatal os.Exit(1)
-func Fatal(v ...interface{}) {
-	fmt.Println(v...)
-
-	e.checkNewDayWithLock()
-	e.lg.SetPrefix(fatalPrefix)
-	e.lg.Output(2, fmt.Sprintln(v...))
-
-	e.logfile.Write(debug.Stack())
-	os.Exit(1)
-}
-
-var panicPrefix = color.RedString("PANC ")
-
-// Panicf output log with panicPrefix in format, and trig panic
-func Panicf(format string, v ...interface{}) {
-	e.checkNewDayWithLock()
-	e.lg.SetPrefix(panicPrefix)
-	s := fmt.Sprintf(format, v...)
-	e.lg.Output(2, s)
-	e.logfile.Write(debug.Stack())
-	panic(s)
-}
-
-// Panic output log with panicPrefix in format, and trig panic
-func Panic(v ...interface{}) {
-	e.checkNewDayWithLock()
-	e.lg.SetPrefix(panicPrefix)
-	s := fmt.Sprintln(v...)
-	e.lg.Output(2, s)
-	// e.logfile.Sync()
-	e.logfile.Write(debug.Stack())
-	panic(s)
-}
-
-// PrintStack for debug trace code stack
-func PrintStack() {
-	e.logfile.Write(debug.Stack())
-}
-
-// SetStdoutput set entity Stdout enable
-func SetStdoutput() {
-	e.useStdout = true
-	e.lg.SetOutput(os.Stdout)
-}
-
-var defaultClearLogForwardTime time.Duration = 60 * 24 * time.Hour
-
-// CleanLog ...
-func CleanLog() {
-	folder := "./log"
-	Info("開始進行 log 删除, 日誌保留時間: ", defaultClearLogForwardTime)
-	logs, err := ioutil.ReadDir(folder)
 	if err != nil {
-		Warn("读取 ./log dir fail, err:", err)
-		return
+		panic(err)
 	}
-	for _, log := range logs {
-		if time.Now().Sub(log.ModTime()) > defaultClearLogForwardTime {
-			rmFile := fmt.Sprintf("%s/%s", folder, log.Name())
-			Info("開始刪除:", rmFile, ", 最後更改時間:", log.ModTime().Format("2006/01/02 15:04:05"))
-			// 文件夹
-			if err := os.Remove(rmFile); err != nil {
-				Error("刪除日誌:", rmFile, "出錯了, err:", err)
-			}
-		}
-		// log.ModTime()
-	}
-	Info("结束 log 删除, 完工了")
+
+	return hook
 }
 
-// SetClearLogForwardTime ...
-func SetClearLogForwardTime(t time.Duration) {
-	defaultClearLogForwardTime = t
+// Error ....
+func Error(args ...interface{}) {
+	DefaultLogger.Error(args...)
 }
 
-// GetClearLogForwardTime ...
-func GetClearLogForwardTime() time.Duration {
-	return defaultClearLogForwardTime
+// Errorf ....
+func Errorf(format string, args ...interface{}) {
+	DefaultLogger.Errorf(format, args...)
+}
+
+// Fatalf ....
+func Fatalf(format string, args ...interface{}) {
+	DefaultLogger.Fatalf(format, args...)
+}
+
+// Fatal ....
+func Fatal(args ...interface{}) {
+	DefaultLogger.Fatal(args...)
+}
+
+// Infof ....
+func Infof(format string, args ...interface{}) {
+	DefaultLogger.Infof(format, args...)
+}
+
+// Info ....
+func Info(args ...interface{}) {
+	DefaultLogger.Info(args...)
+}
+
+// Warnf ....
+func Warnf(format string, args ...interface{}) {
+	DefaultLogger.Warnf(format, args...)
+}
+
+// Warn ....
+func Warn(args ...interface{}) {
+	DefaultLogger.Warn(args...)
+}
+
+// Debugf ....
+func Debugf(format string, args ...interface{}) {
+	DefaultLogger.Debugf(format, args...)
+}
+
+// Debug ....
+func Debug(args ...interface{}) {
+	DefaultLogger.Debug(args...)
+}
+
+// Panicf ....
+func Panicf(format string, args ...interface{}) {
+	DefaultLogger.Panicf(format, args...)
+}
+
+// Panic ....
+func Panic(args ...interface{}) {
+	DefaultLogger.Panic(args...)
+}
+
+// With ...
+func With(val ...interface{}) Logger {
+	return DefaultLogger.With(val...)
 }

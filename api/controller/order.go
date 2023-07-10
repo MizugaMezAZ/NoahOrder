@@ -2,19 +2,19 @@ package controller
 
 import "github.com/gin-gonic/gin"
 
-type IOrder interface {
+type IOrderController interface {
 	NewOrder(*gin.Context)
 }
 
-type order struct {
+type orderController struct {
 }
 
-func NewRouter() IOrder {
-	return &order{}
+func NewRouter() IOrderController {
+	return &orderController{}
 }
 
 // ----------------------------------
 
-func (*order) NewOrder(ctx *gin.Context) {
+func (*orderController) NewOrder(ctx *gin.Context) {
 
 }
