@@ -3,7 +3,9 @@ package main
 import (
 	"context"
 	"fmt"
-	"gorder/db"
+	"gorder/api/repository"
+	"gorder/api/service"
+	"gorder/database"
 	"gorder/logger"
 	"gorder/logger/zap"
 	"net/http"
@@ -64,6 +66,12 @@ func main() {
 }
 
 func fiveLionFit() {
-	db.NewDB()
-	db.NewRedis()
+	authRepo := repository.NewAuthRepository(database.DB)
+	orderRepo := repository.NewOrderRepository(database.DB, database.RDB)
+
+	authService := service.NewAuthService(authRepo)
+	orderService := service.NewOrderService(orderRepo)
+
+	_ = authService
+	_ = orderService
 }

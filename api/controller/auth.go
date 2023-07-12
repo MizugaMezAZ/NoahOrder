@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"gorder/api/service"
 	"gorder/util/response"
 
 	"github.com/gin-gonic/gin"
@@ -12,10 +13,13 @@ type IAuthController interface {
 }
 
 type authController struct {
+	as service.IAuthService
 }
 
-func NewAuthController() IAuthController {
-	return &authController{}
+func NewAuthController(as service.IAuthService) IAuthController {
+	return &authController{
+		as: as,
+	}
 }
 
 // ----------------------------------

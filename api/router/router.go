@@ -1,6 +1,10 @@
 package router
 
-import "github.com/gin-gonic/gin"
+import (
+	"gorder/api/middleware"
+
+	"github.com/gin-gonic/gin"
+)
 
 type router struct {
 }
@@ -10,5 +14,5 @@ func NewRouter() *router {
 }
 
 func (r *router) SetupRoute(e *gin.Engine) {
-	e.Use()
+	e.Use(middleware.CrosHandler())
 }

@@ -20,23 +20,23 @@ var DefaultLogger Logger = &Log{}
 
 // Logger 無需修改業務代碼即可切換到其他日誌庫 不直接依賴任何日誌庫
 type Logger interface {
+	Debug(args ...interface{})
+	Debugf(format string, args ...interface{})
+
+	Info(args ...interface{})
+	Infof(format string, args ...interface{})
+
+	Warn(args ...interface{})
+	Warnf(format string, args ...interface{})
+
 	Error(args ...interface{})
 	Errorf(format string, args ...interface{})
 
-	Fatalf(format string, args ...interface{})
 	Fatal(args ...interface{})
+	Fatalf(format string, args ...interface{})
 
-	Infof(format string, args ...interface{})
-	Info(args ...interface{})
-
-	Warnf(format string, args ...interface{})
-	Warn(args ...interface{})
-
-	Debugf(format string, args ...interface{})
-	Debug(args ...interface{})
-
-	Panicf(format string, args ...interface{})
 	Panic(args ...interface{})
+	Panicf(format string, args ...interface{})
 
 	With(val ...interface{}) Logger
 }
@@ -62,6 +62,26 @@ func GetRotationWriter(filename string) io.Writer {
 	return hook
 }
 
+// Debug ....
+func Debug(args ...interface{}) {
+	DefaultLogger.Debug(args...)
+}
+
+// Debugf ....
+func Debugf(format string, args ...interface{}) {
+	DefaultLogger.Debugf(format, args...)
+}
+
+// Info ....
+func Info(args ...interface{}) {
+	DefaultLogger.Info(args...)
+}
+
+// Infof ....
+func Infof(format string, args ...interface{}) {
+	DefaultLogger.Infof(format, args...)
+}
+
 // Error ....
 func Error(args ...interface{}) {
 	DefaultLogger.Error(args...)
@@ -72,29 +92,14 @@ func Errorf(format string, args ...interface{}) {
 	DefaultLogger.Errorf(format, args...)
 }
 
-// Fatalf ....
-func Fatalf(format string, args ...interface{}) {
-	DefaultLogger.Fatalf(format, args...)
-}
-
 // Fatal ....
 func Fatal(args ...interface{}) {
 	DefaultLogger.Fatal(args...)
 }
 
-// Infof ....
-func Infof(format string, args ...interface{}) {
-	DefaultLogger.Infof(format, args...)
-}
-
-// Info ....
-func Info(args ...interface{}) {
-	DefaultLogger.Info(args...)
-}
-
-// Warnf ....
-func Warnf(format string, args ...interface{}) {
-	DefaultLogger.Warnf(format, args...)
+// Fatalf ....
+func Fatalf(format string, args ...interface{}) {
+	DefaultLogger.Fatalf(format, args...)
 }
 
 // Warn ....
@@ -102,14 +107,9 @@ func Warn(args ...interface{}) {
 	DefaultLogger.Warn(args...)
 }
 
-// Debugf ....
-func Debugf(format string, args ...interface{}) {
-	DefaultLogger.Debugf(format, args...)
-}
-
-// Debug ....
-func Debug(args ...interface{}) {
-	DefaultLogger.Debug(args...)
+// Warnf ....
+func Warnf(format string, args ...interface{}) {
+	DefaultLogger.Warnf(format, args...)
 }
 
 // Panicf ....

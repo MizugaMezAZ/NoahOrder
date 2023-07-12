@@ -3,7 +3,7 @@ package controller
 import "github.com/gin-gonic/gin"
 
 type IOrderController interface {
-	NewOrder(*gin.Context)
+	CreateOrder(*gin.Context)
 }
 
 type orderController struct {
@@ -15,6 +15,6 @@ func NewRouter() IOrderController {
 
 // ----------------------------------
 
-func (*orderController) NewOrder(ctx *gin.Context) {
+func (*orderController) CreateOrder(ctx *gin.Context) {
 
 }
