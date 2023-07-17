@@ -15,4 +15,7 @@ func NewRouter() *router {
 
 func (r *router) SetupRoute(e *gin.Engine) {
 	e.Use(middleware.CrosHandler())
+
+	e.GET("/:orderid")
+	e.POST("/")
 }

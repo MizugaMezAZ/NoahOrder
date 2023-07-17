@@ -3,7 +3,6 @@ package repository
 import (
 	"context"
 	"gorder/model"
-	"gorder/util/lib"
 	"time"
 
 	"github.com/go-redis/redis/v8"
@@ -39,7 +38,7 @@ func (o *orderRepository) CreateOrder(args model.Order) error {
 						area,
 						created_time,
 						expiration_time
-					)VALUE (
+					)VALUES (
 						:id,
 						:people,
 						:price,
@@ -52,6 +51,11 @@ func (o *orderRepository) CreateOrder(args model.Order) error {
 		return err
 	}
 
-	o.rdb.Set(ctx, lib.RedisFormatKey("order", args.ID), args, 90*time.Minute)
+	o.rdb.HSet(ctx, "order", args.ID, args, 90*time.Minute)
 	return nil
+}
+
+func (o *orderRepository) GetOrder(id string) (model.Order, error) {
+	o.rdb.HGet(ctx, "order", id).Bytes()
+	return model.Order{}, nil
 }

@@ -1,8 +1,12 @@
 package service
 
-import "gorder/api/repository"
+import (
+	"gorder/api/repository"
+	"gorder/model"
+)
 
 type IOrderService interface {
+	CreateOrder(args model.Order) error
 }
 
 type orderService struct {
@@ -16,3 +20,6 @@ func NewOrderService(or repository.IOrderRepository) IOrderService {
 }
 
 // ----------------------------------
+func (o *orderService) CreateOrder(args model.Order) error {
+	return nil
+}

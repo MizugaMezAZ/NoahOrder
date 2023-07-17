@@ -3,6 +3,7 @@ module gorder
 go 1.20
 
 require (
+	github.com/bwmarrin/snowflake v0.3.0
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/fatih/color v1.15.0
 	github.com/gin-contrib/pprof v1.4.0
@@ -12,6 +13,7 @@ require (
 	github.com/jmoiron/sqlx v1.3.5
 	github.com/joho/godotenv v1.5.1
 	github.com/lestrrat-go/file-rotatelogs v2.4.0+incompatible
+	github.com/sony/sonyflake v1.1.0
 	go.uber.org/zap v1.24.0
 )
 

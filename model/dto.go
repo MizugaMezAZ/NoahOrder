@@ -10,3 +10,8 @@ type Order struct {
 	CreatedTime    time.Time `json:"created_time" db:"created_time"`
 	ExpirationTime time.Time `json:"expiration_time" db:"expiration_time"`
 }
+
+type UUID struct {
+	ID     int64
+	Base58 string
+}
