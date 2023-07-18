@@ -10,7 +10,7 @@ type snowFlake struct {
 	sf *snowflake.Node
 }
 
-func NewSnowFlake() uuid {
+func newSnowFlake() uuid {
 	node, err := snowflake.NewNode(1)
 	if err != nil {
 		return nil
@@ -19,7 +19,7 @@ func NewSnowFlake() uuid {
 	return &snowFlake{node}
 }
 
-func (s *snowFlake) Gen() model.UUID {
+func (s *snowFlake) gen() model.UUID {
 	id := s.sf.Generate()
 
 	return model.UUID{

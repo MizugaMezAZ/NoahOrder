@@ -3,15 +3,15 @@ package uuid
 import "gorder/model"
 
 type uuid interface {
-	Gen() model.UUID
+	gen() model.UUID
 }
 
 var defaultUUID uuid
 
 func init() {
-	defaultUUID = NewSnowFlake()
+	defaultUUID = newSnowFlake()
 }
 
 func GenUUID() model.UUID {
-	return defaultUUID.Gen()
+	return defaultUUID.gen()
 }

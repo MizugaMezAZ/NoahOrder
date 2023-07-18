@@ -11,7 +11,7 @@ type sonyFlake struct {
 	sf *sonyflake.Sonyflake
 }
 
-func NewSonyFlake() uuid {
+func newSonyFlake() uuid {
 	sf := sonyflake.NewSonyflake(sonyflake.Settings{
 		MachineID: func() (uint16, error) { return 0, nil },
 	})
@@ -19,7 +19,8 @@ func NewSonyFlake() uuid {
 	return &sonyFlake{sf}
 }
 
-func (s *sonyFlake) Gen() model.UUID {
+func (s *sonyFlake) gen() model.UUID {
+	// 這邊err 只有在超過使用年限後會報錯 不考慮
 	uintid, _ := s.sf.NextID()
 
 	id := snowflake.ID(uintid)
