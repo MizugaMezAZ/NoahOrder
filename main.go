@@ -67,10 +67,10 @@ func main() {
 
 func fiveLionFit() {
 	authRepo := repository.NewAuthRepository(database.DB)
-	orderRepo := repository.NewOrderRepository(database.DB, database.RDB)
+	orderRepo := repository.NewBillRepository(database.DB, database.RDB)
 
 	authService := service.NewAuthService(authRepo)
-	orderService := service.NewOrderService(orderRepo)
+	orderService := service.NewBillService(orderRepo)
 
 	_ = authService
 	_ = orderService
