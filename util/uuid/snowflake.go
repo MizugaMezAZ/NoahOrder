@@ -1,8 +1,6 @@
 package uuid
 
 import (
-	"gorder/model"
-
 	"github.com/bwmarrin/snowflake"
 )
 
@@ -19,11 +17,8 @@ func newSnowFlake() uuid {
 	return &snowFlake{node}
 }
 
-func (s *snowFlake) gen() model.UUID {
+func (s *snowFlake) gen() int64 {
 	id := s.sf.Generate()
 
-	return model.UUID{
-		ID:     id.Int64(),
-		Base58: id.Base58(),
-	}
+	return id.Int64()
 }

@@ -3,7 +3,7 @@ package uuid
 import "gorder/model"
 
 type uuid interface {
-	gen() model.UUID
+	gen() int64
 }
 
 var defaultUUID uuid
@@ -13,5 +13,10 @@ func init() {
 }
 
 func GenUUID() model.UUID {
-	return defaultUUID.gen()
+	id := defaultUUID.gen()
+
+	return model.UUID{
+		ID:     id,
+		Base58: base58(id),
+	}
 }

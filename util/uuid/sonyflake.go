@@ -1,9 +1,6 @@
 package uuid
 
 import (
-	"gorder/model"
-
-	"github.com/bwmarrin/snowflake"
 	"github.com/sony/sonyflake"
 )
 
@@ -19,14 +16,9 @@ func newSonyFlake() uuid {
 	return &sonyFlake{sf}
 }
 
-func (s *sonyFlake) gen() model.UUID {
+func (s *sonyFlake) gen() int64 {
 	// 這邊err 只有在超過使用年限後會報錯 不考慮
-	uintid, _ := s.sf.NextID()
+	id, _ := s.sf.NextID()
 
-	id := snowflake.ID(uintid)
-
-	return model.UUID{
-		ID:     id.Int64(),
-		Base58: id.Base58(),
-	}
+	return int64(id)
 }
