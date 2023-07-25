@@ -1,21 +1,32 @@
 package router
 
 import (
+	"gorder/api/controller"
 	"gorder/api/middleware"
 
 	"github.com/gin-gonic/gin"
 )
 
-type router struct {
+type RouterParam struct {
+	AuthController controller.IAuthController
+	BillController controller.IBillController
 }
 
-func NewRouter() *router {
-	return &router{}
+type HttpRouter struct {
+	ac controller.IAuthController
+	bc controller.IBillController
 }
 
-func (r *router) SetupRoute(e *gin.Engine) {
+func NewRouter(r RouterParam) *HttpRouter {
+	return &HttpRouter{
+		ac: r.AuthController,
+		bc: r.BillController,
+	}
+}
+
+func (r *HttpRouter) SetupRoute(e *gin.Engine) {
 	e.Use(middleware.CrosHandler())
 
-	e.GET("/:orderid")
-	e.POST("/")
+	e.GET("/bill/:orderid", r.bc.GetBill)
+	e.POST("/bill", r.bc.CreateBill)
 }

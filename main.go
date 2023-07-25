@@ -3,7 +3,9 @@ package main
 import (
 	"context"
 	"fmt"
+	"gorder/api/controller"
 	"gorder/api/repository"
+	"gorder/api/router"
 	"gorder/api/service"
 	"gorder/database"
 	"gorder/logger"
@@ -26,12 +28,12 @@ func init() {
 }
 
 func main() {
-	// router := fiveLionFit()
+	router := fiveLionFit()
 
 	engine := gin.Default()
 
 	pprof.Register(engine)
-	// router.SetupRoute(engine)
+	router.SetupRoute(engine)
 
 	addr := fmt.Sprintf("%s:%s", "", "7123")
 
@@ -65,13 +67,20 @@ func main() {
 	fmt.Println("訂單系統已停止")
 }
 
-func fiveLionFit() {
+func fiveLionFit() *router.HttpRouter {
 	authRepo := repository.NewAuthRepository(database.DB)
-	orderRepo := repository.NewBillRepository(database.DB, database.RDB)
+	billRepo := repository.NewBillRepository(database.DB, database.RDB)
 
 	authService := service.NewAuthService(authRepo)
-	orderService := service.NewBillService(orderRepo)
+	billService := service.NewBillService(billRepo)
 
-	_ = authService
-	_ = orderService
+	authController := controller.NewAuthController(authService)
+	billController := controller.NewBillController(billService)
+
+	router := router.NewRouter(router.RouterParam{
+		AuthController: authController,
+		BillController: billController,
+	})
+
+	return router
 }
