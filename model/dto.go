@@ -12,7 +12,7 @@ type Bill struct {
 	ExpirationTime time.Time `json:"expiration_time" db:"expiration_time"` // 資料採用redis HASH存儲 HASH沒有單一過期系統 寫在裡面自己判斷
 }
 
-type UUID struct {
+type SnowID struct {
 	ID     int64
 	Base58 string
 }

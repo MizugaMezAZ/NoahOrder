@@ -12,10 +12,10 @@ func init() {
 	defaultUUID = newSnowFlake()
 }
 
-func GenUUID() model.UUID {
+func GenUUID() model.SnowID {
 	id := defaultUUID.gen()
 
-	return model.UUID{
+	return model.SnowID{
 		ID:     id,
 		Base58: base58(id),
 	}

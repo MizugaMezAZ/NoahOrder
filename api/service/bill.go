@@ -23,12 +23,12 @@ func NewBillService(or repository.IBillRepository) IBillService {
 
 // ----------------------------------
 func (o *billService) CreateBill(b model.Bill) error {
-	id := uuid.GenUUID()
+	snowid := uuid.GenUUID()
 
 	now := time.Now()
 
-	b.ID = id.ID
-	b.EncodeID = id.Base58
+	b.ID = snowid.ID
+	b.EncodeID = snowid.Base58
 	b.CreatedTime = now
 	b.ExpirationTime = now.Add(model.ExpirationTime)
 
